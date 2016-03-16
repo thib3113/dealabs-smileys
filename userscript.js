@@ -210,7 +210,7 @@ jQuery(function(){
     
     current_smileys = JSON.parse(unsafeWindow.localStorage.getItem('userscript_emoticones'))||{};
     for(var nom in current_smileys){
-       text = text.replace(new RegExp(':'+nom+':'), '[img size="300px"]'+current_smileys[nom]+'[/img]');
+       text = text.replace(new RegExp(':'+nom+':', 'g'), '[img size="300px"]'+current_smileys[nom]+'[/img]');
     }
 
     jQuery(this).find('[name="post_content"]').val(text);      
