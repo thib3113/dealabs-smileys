@@ -1,6 +1,7 @@
 // ==UserScript==
 // @name    Smilley BBCode for dealabs
-// @version 1.7.1
+// @version 1.7.2
+// @maj       Pas de retour au début de la zone de saisie aprés insertion d'un smiley
 // @description Ajout de smiley sur dealabs
 // @include http://*.dealabs.com/*
 // @run-at document-end
@@ -135,7 +136,7 @@ function update_emoticone_textarea()
             mm.href="javascript:;";
             mm.setAttribute("style",'text-decoration:none');
             mm.dataset.role = "emoticone_add_userscript";
-            mm.innerHTML='<img height="16" title="'+title+'" src="'+current_smileys[title]+'" alt="'+title+'"/>';
+            mm.innerHTML='<img style="max-height:20px" title="'+title+'" src="'+current_smileys[title]+'" alt="'+title+'"/>';
             mm.addEventListener("click", insertSmiley, true);
             c.appendChild(mm);
         }   
