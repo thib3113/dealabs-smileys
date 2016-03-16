@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name    Smilley BBCode for dealabs
-// @version 1.7.3
+// @version 1.7.4
 // @description Ajout de smiley sur dealabs
 // @include http://*.dealabs.com/*
 // @run-at document-end
@@ -165,11 +165,42 @@ function update_emoticone_textarea()
     });
 }
 
+//override
+function validate_comment() {
+    error = false;
+    error_text = "Des champs obligatoires n’ont pas été remplis, ou l’ont été incorrectement.";
+    $("#discussed .flag.obligatoire").each(function() {
+        verif_champs_obligatoire(this)
+    });
+    if (!error) {
+        $("#discussed .message_erreur_header").hide();
+        $("#discussed .validate_form a").attr('onclick', "");
+        $("#discussed .spinner_validate").show();
+        if (typeof document.forms.comment_form.deal_id != 'undefined') {
+            var v = sessionStorage.getItem('comment_for_deal_' + document.forms.comment_form.deal_id.value);
+            if (v) {
+                sessionStorage.removeItem('comment_for_deal_' + document.forms.comment_form.deal_id.value)
+            }
+        } else if (typeof document.forms.comment_form.thread_id != 'undefined') {
+            var v = sessionStorage.getItem('comment_for_thread_' + document.forms.comment_form.thread_id.value);
+            if (v) {
+                sessionStorage.removeItem('comment_for_thread_' + document.forms.comment_form.thread_id.value)
+            }
+        }
+        jQuery(document.comment_form).trigger('submit')
+    } else {
+        $("#discussed .message_erreur_header").slideDown("fast");
+        $("#discussed .message_erreur_header p").text(error_text)
+    }
+}
+
+
 update_emoticone_textarea();
 passFunctionToConsole(update_emoticone_textarea);
 passFunctionToConsole(addSmiley);
 passFunctionToConsole(insertSmiley);
 passFunctionToConsole(removeSmiley);
+passFunctionToConsole(validate_comment);
 
 jQuery(function(){
   jQuery('body').on('submit', 'form', function(){
