@@ -1,7 +1,6 @@
 // ==UserScript==
 // @name    Smilley BBCode for dealabs
-// @version 1.7.2
-// @maj       Pas de retour au début de la zone de saisie aprés insertion d'un smiley
+// @version 1.7.3
 // @description Ajout de smiley sur dealabs
 // @include http://*.dealabs.com/*
 // @run-at document-end
@@ -74,9 +73,32 @@ function insertSmiley()
     var scrollTop = textarea.scrollTop;
     var scrollLeft = textarea.scrollLeft;
 
-    var image = this.getElementsByTagName('img')[0].getAttribute("src");
+    var nom = this.getElementsByTagName('img')[0].getAttribute("title");
     textarea.focus();
-    textarea.value += '[img size="300px"]'+image+"[/img]";
+    //textarea.value += '[img size="300px"]'+image+"[/img]";
+    //add smiley at cursor position
+    var cursorPos = jQuery(textarea).prop('selectionStart');
+    var v = jQuery(textarea).val()
+    v = v.slice(0, textarea.selectionStart) + v.slice(textarea.selectionEnd);;
+    var textBefore = v.substring(0,  cursorPos);
+    var textAfter  = v.substring(cursorPos, v.length);
+    $(textarea).val(textBefore + ':'+nom+":" + textAfter);
+
+    //positionne cursor in textarea
+    selectionStart = selectionEnd = (textBefore + ':'+nom+":").length
+    if (textarea.setSelectionRange) {
+        textarea.focus();
+        textarea.setSelectionRange(selectionStart, selectionEnd);
+    }
+    else if (textarea.createTextRange) {
+        var range = textarea.createTextRange();
+        range.collapse(true);
+        range.moveEnd('character', selectionEnd);
+        range.moveStart('character', selectionStart);
+        range.select();
+    }
+
+    // textarea.value += ':'+nom+":";
     textarea.scrollTop = scrollTop;
     textarea.scrollLeft = scrollLeft;
 }
@@ -148,3 +170,18 @@ passFunctionToConsole(update_emoticone_textarea);
 passFunctionToConsole(addSmiley);
 passFunctionToConsole(insertSmiley);
 passFunctionToConsole(removeSmiley);
+
+jQuery(function(){
+  jQuery('body').on('submit', 'form', function(){
+    text = jQuery(this).find('[name="post_content"]').val();
+    if(typeof unsafeWindow == "undefined")
+      unsafeWindow = window;
+    
+    current_smileys = JSON.parse(unsafeWindow.localStorage.getItem('userscript_emoticones'))||{};
+    for(var nom in current_smileys){
+       text = text.replace(new RegExp(':'+nom+':'), '[img size="300px"]'+current_smileys[nom]+'[/img]');
+    }
+
+    jQuery(this).find('[name="post_content"]').val(text);      
+  })
+})
